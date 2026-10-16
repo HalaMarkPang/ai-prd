@@ -2,79 +2,96 @@
 
 English | [中文](README.md)
 
-An Agent Skill that makes AI agents write PRDs (product requirements documents) the way a senior product manager would. It turns a one-line idea, a BRD, meeting notes, an existing PRD, and the current codebase into a PRD that engineers can review and QA can turn into test cases.
+AI-PRD is an Agent Skill for writing, revising, and reviewing product requirements documents (PRDs). It defines the workflow, decision rules, and validation criteria an agent follows from raw requirement materials to an engineering-review draft. It works with agent clients that support skills or rule files, such as Claude Code, Codex, and Cursor.
 
-> The rule files are written in Chinese. Agents that read Chinese (Claude, GPT, Gemini, Qwen, etc.) follow them regardless of the conversation language, and the PRD is written in whatever language you ask for.
+The rule files are written in Chinese. Capable models follow them regardless of the conversation language, and the PRD is written in the language you request.
 
-What makes it different from "give me a PRD template":
+## Problems addressed
 
-- **Intake before writing.** The agent first inventories your materials, tells you what is missing and why it matters, and asks one consolidated round of at most five questions, each with a default you can accept. It does not produce a confident-looking PRD built on guesses.
-- **Should we build it at all?** Before writing, it assesses whether the problem is real, whether it is worth doing now, cheaper alternatives, and scope. If the case does not hold, it aligns with you first.
-- **Evidence-backed current state.** It gathers code evidence according to the access you can provide. Any claim about the current system must be traced back to `file:line`; anything unverified is marked "to be confirmed".
-- **Your format first.** If you have a template or a sample PRD, it follows that. Otherwise it uses its PRD template, trimmed to the requirement's complexity.
-- **Modes and permissions.** Full draft, review-ready concise draft, partial revision, and read-only review. Read-only requests never turn into writes.
+PRDs generated directly by AI tend to fail in five ways:
 
-## Quick start
+1. The full document is generated even when information is missing, so key conclusions rest on guesses.
+2. Solution design starts before anyone checks whether the requirement holds.
+3. Descriptions of the existing system have no evidence and do not match the implementation.
+4. A fixed template is applied regardless of the team's format and review needs.
+5. A request to review or partially edit results in a rewrite of the whole document or an online page.
 
-### Install
+## Mechanisms
 
-AI-PRD is a standard Agent Skill directory with `SKILL.md` as the entry point. Keep the **whole directory**: the entry file references files under `references/` and `templates/`.
-
-| Client | How |
-|---|---|
-| Claude Code | `git clone https://github.com/HalaMarkPang/ai-prd ~/.claude/skills/ai-prd` |
-| Cursor | Clone into `~/.cursor/skills/ai-prd` or a project's `.cursor/skills/ai-prd` |
-| Codex | Clone into `~/.codex/skills/ai-prd`, or reference `SKILL.md` from `AGENTS.md` and keep the directory readable |
-| Other agents | Have the agent read `SKILL.md` and the files it references; pasting `SKILL.md` alone is not enough |
-
-### Use
-
-Just ask your agent:
-
-```text
-Use AI-PRD to write a PRD: overdue tasks get ignored, add an overdue reminder.
-```
-
-```text
-Turn this BRD into a PRD using our team template. The code is in ~/code/my-product.
-```
-
-```text
-Review this PRD and tell me the issues in chat only. Do not edit the document.
-```
-
-The first reply contains a readiness table and the questions it needs answered. Answer them, or reply "continue with defaults". See the [worked example](examples/overdue-task-reminder/README.md) (in Chinese).
+| Problem | Mechanism | Rule file |
+|---|---|---|
+| Generating despite missing information | Intake: inventory the materials, rate eight readiness items as available / assumable / blocking, and ask one consolidated round of questions about blockers, each with a default | [intake.md](references/intake.md) |
+| No check on whether the requirement holds | Up-front assessment of validity, necessity, alternatives, and scope; if it does not hold, align with the user first | [prd-generation.md](references/prd-generation.md) |
+| Unsupported claims about the current system | Code access levels (L0–L4) and evidence rules: claims must be verified to `file:line`; anything unverified is listed as open | [code-evidence.md](references/code-evidence.md) |
+| Format mismatch | Format priority: the user's template or sample comes first; otherwise the skill's PRD template, trimmed to the requirement's complexity | [prd-template.md](templates/prd-template.md) |
+| Unauthorized edits | Task modes and write permissions: full draft, concise review draft, partial revision, read-only review; read-only tasks never become writes | [review-and-notification-rules.md](references/review-and-notification-rules.md) |
 
 ## Workflow
 
 ```text
-Task mode and write permissions
-→ Intake: inventory materials, ask one round of questions
+Determine task mode and write permissions
+→ Intake
 → Requirement assessment (new) / change impact check (revision)
-→ Verify current state as needed (code evidence traced to lines)
+→ Verify the current state as needed
 → Change baseline and business model
-→ Rules, data, interaction, dependencies
-→ Draft in your format, or produce a patch
+→ Rules, data, interaction, and dependencies
+→ Draft in the user's format, or produce a patch
 → Validate and deliver within the granted permissions
 ```
 
-## Connecting code
+A read-only review ends after feedback is given; no file is created and nothing is written.
 
-During intake the agent asks where your code lives:
+## Installation
 
-| Level | Your situation | What the agent does |
+AI-PRD uses `SKILL.md` as its entry point, which references the rule files under `references/` and `templates/`. Install the whole directory.
+
+| Client | Installation |
+|---|---|
+| Claude Code | `git clone https://github.com/HalaMarkPang/ai-prd ~/.claude/skills/ai-prd` |
+| Cursor | Clone into `~/.cursor/skills/ai-prd` or a project's `.cursor/skills/ai-prd` |
+| Codex | Clone into `~/.codex/skills/ai-prd`, or reference `SKILL.md` from `AGENTS.md` and keep the directory readable |
+| Other agents | Have the agent read `SKILL.md` and the files it references; `SKILL.md` alone does not load the full rule set |
+
+## Usage
+
+State the task in the conversation. The examples below correspond to the four task modes:
+
+| Task mode | Example |
+|---|---|
+| Full draft | Use AI-PRD to write a PRD for an overdue-task reminder. The code is in `~/code/my-product`. |
+| Concise review draft | Turn this BRD into an engineering-review draft using the attached team template. |
+| Partial revision | Revise only the "exceptions and failure handling" section of this PRD and leave the rest unchanged. |
+| Read-only review | Review this PRD and report issues in the conversation only. Do not edit the document. |
+
+The agent's first reply contains its understanding of the requirement, a readiness table, and open questions. Answer them, or reply "continue with defaults"; the defaults it adopts are then listed as open questions in the PRD.
+
+See the [overdue-task reminder example](examples/overdue-task-reminder/README.md) (in Chinese). The product, data, and code in the example are fictional.
+
+## Code access
+
+For changes to an existing system, the agent confirms code access during intake and records the level used in the PRD:
+
+| Level | Condition | Basis for current-state claims |
 |---|---|---|
-| L0 | No code access | Marks every current-state claim as "to be confirmed" |
-| L1 | You paste snippets or API docs | Reasons only from what you pasted |
-| L2 | Repos are cloned locally | Read-only local search with `file:line` evidence |
-| L3 | Many repos, complex call chains | Locates with a code-graph tool, then reads the source |
-| L4 | Repos on GitHub / GitLab | Read-only API queries; you set a read-only token locally |
+| L0 | No code provided | None; all such claims are marked as open |
+| L1 | Snippets or API docs provided | Only the provided material |
+| L2 | Repositories cloned locally | Read-only local search, verified to `file:line` |
+| L3 | Multiple repositories, complex call chains | Located with a code graph, then verified in source |
+| L4 | Repositories on GitHub, GitLab, or similar | Read-only platform APIs; recall is usually narrower than local search |
 
-Tokens stay in your local environment variables. The agent never asks you to paste them into the chat.
+Credentials stay in the user's local environment variables and are never recorded in the conversation, the PRD, or logs.
+
+## Output conventions
+
+- The PRD body targets engineering review. Assessment, fact extraction, requirement models, and review reports are internal artifacts and are excluded from the body by default.
+- Key conclusions are labeled with their source: user statement, original material, existing PRD, code, reasoned inference, or open question.
+- The PRD describes product-side data needs, business meaning, and error handling. It does not define API fields, error codes, timeouts, caching, or other technical parameters.
+- Metrics without a complete definition (scope, data source, time window, attribution) are treated as post-launch observations, not committed targets.
+- Functional correctness, operational quality, and business impact are validated separately; tests that were not run are not reported as passed.
 
 ## Contributing
 
-Issues and PRs are welcome. When changing rules, update the cases in `references/review-regression-cases.md`.
+Issues and pull requests are welcome. When changing a rule, update the [check cases](references/review-regression-cases.md) with the expected and prohibited behaviors.
 
 ## License
 
