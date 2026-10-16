@@ -89,6 +89,26 @@ Credentials stay in the user's local environment variables and are never recorde
 - Metrics without a complete definition (scope, data source, time window, attribution) are treated as post-launch observations, not committed targets.
 - Functional correctness, operational quality, and business impact are validated separately; tests that were not run are not reported as passed.
 
+## Directory structure
+
+```text
+ai-prd/
+├── SKILL.md                              # Entry: task modes, readiness intake, main flow
+├── references/
+│   ├── intake.md                         # Readiness intake
+│   ├── prd-generation.md                 # Execution modes, constraints, steps, validation
+│   ├── requirement-method.md             # Requirement analysis and expression methods
+│   ├── review-and-notification-rules.md  # Draft review, async events, rate limiting
+│   ├── review-regression-cases.md        # Check cases
+│   ├── doc-sources.md                    # Reading materials and completeness checks
+│   └── code-evidence.md                  # Code access levels and evidence discipline
+├── templates/
+│   ├── prd-template.md                   # PRD template
+│   └── evidence-template.md              # Code evidence template
+└── examples/
+    └── overdue-task-reminder/            # Fictional example
+```
+
 ## Contributing
 
 Issues and pull requests are welcome. When changing a rule, update the [check cases](references/review-regression-cases.md) with the expected and prohibited behaviors.
