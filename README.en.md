@@ -79,12 +79,12 @@ For changes to an existing system, the agent confirms code access during intake 
 | L3 | Multiple repositories, complex call chains | Located with a code graph, then verified in source |
 | L4 | Repositories on GitHub, GitLab, or similar | Read-only platform APIs; recall is usually narrower than local search |
 
-Credentials stay in the user's local environment variables and are never recorded in the conversation, the PRD, or logs.
+Public repositories need no credentials. For private repositories, credentials stay in the user's local environment variables and are never recorded in the conversation, the PRD, or logs.
 
 ## Output conventions
 
-- The PRD body targets engineering review. Assessment, fact extraction, requirement models, and review reports are internal artifacts and are excluded from the body by default.
-- Key conclusions are labeled with their source: user statement, original material, existing PRD, code, reasoned inference, or open question.
+- The PRD body targets engineering review. Intake results, requirement assessment, source facts and constraints, requirement models, review reports, and scores are internal artifacts and are excluded from the body by default.
+- Key conclusions are labeled with their source: explicit user statement, original material, existing PRD, code or system state, reasoned inference, or open question.
 - The PRD describes product-side data needs, business meaning, and error handling. It does not define API fields, error codes, timeouts, caching, or other technical parameters.
 - Metrics without a complete definition (scope, data source, time window, attribution) are treated as post-launch observations, not committed targets.
 - Functional correctness, operational quality, and business impact are validated separately; tests that were not run are not reported as passed.
