@@ -39,7 +39,7 @@ Determine the task mode and write authorization
 → Review and validate; deliver within the authorized scope
 ```
 
-## Process constraints
+## Constraints and boundaries
 
 1. **Full read**: A complete assessment conclusion and a complete document body are issued only after the designated materials have been read. Section navigation and material-pack summaries are used only to locate the source text. A partial read yields only a stage judgment limited to what was read, with the effect of unread parts stated.
 2. **Intake and clarification**: Opening readiness intake asks at most five questions in a single round, each with its reason and default; no questions are raised when the materials are complete. After assessment begins, only unknowns that may still change whether to build, the scope, or the option are clarified one at a time. Clarification items are resolved before delivery; the open-questions section retains only items still unresolved at delivery.
@@ -75,7 +75,7 @@ The agent's first reply contains its understanding of the requirement, a readine
 
 For a complete walkthrough, see the [overdue-task reminder example](examples/overdue-task-reminder/README.md) (in Chinese). The product, data, and code in the example are fictional.
 
-## Code access
+### Code access
 
 When a requirement involves changes to an existing system, the agent confirms the available code access during intake and records the level applied in the PRD:
 
