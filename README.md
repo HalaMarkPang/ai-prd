@@ -1,7 +1,5 @@
 # AI-PRD
 
-[English](README.en.md) | 中文
-
 AI-PRD 是用于生成、修订与审查产品需求文档（PRD）的 Agent Skill。它规定从需求材料到研发可评审稿的工作流程、判断规则与验证标准，适用于 Claude Code、Codex、Cursor 等支持 Skill 或规则文件的 Agent 客户端。
 
 ## 解决的问题
